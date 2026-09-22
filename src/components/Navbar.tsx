@@ -12,7 +12,8 @@ import {
   Menu,
   SlidersHorizontal,
   Flame,
-  Check
+  Check,
+  LogOut
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { VideoCategory } from '../types';
@@ -42,7 +43,8 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth }) => {
     updateUserRole,
     isInWatchLater,
     videos,
-    isAdmin
+    isAdmin,
+    logoutUser
   } = useApp();
 
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -224,6 +226,18 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth }) => {
                         Open Creator & Admin Studio
                       </button>
                     )}
+
+                    <button
+                      id="profile-logout-btn"
+                      onClick={() => {
+                        logoutUser();
+                        setIsProfileOpen(false);
+                      }}
+                      className="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 rounded-lg transition-colors border-t border-zinc-800/60 mt-1"
+                    >
+                      <LogOut className="w-4 h-4 text-rose-400" />
+                      Log Out
+                    </button>
                   </div>
                 </div>
               )}
@@ -310,6 +324,29 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth }) => {
                 <SlidersHorizontal className="w-4 h-4" /> Creator & Admin Studio
               </button>
             )}
+
+            {onOpenAuth && (
+              <button
+                onClick={() => {
+                  onOpenAuth();
+                  setIsMobileMenuOpen(false);
+                }}
+                className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-zinc-300 hover:text-white"
+              >
+                <User className="w-4 h-4 text-amber-400" /> Account Settings
+              </button>
+            )}
+
+            <button
+              id="mobile-drawer-logout-btn"
+              onClick={() => {
+                logoutUser();
+                setIsMobileMenuOpen(false);
+              }}
+              className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-rose-400 hover:bg-rose-500/10"
+            >
+              <LogOut className="w-4 h-4 text-rose-400" /> Log Out
+            </button>
           </div>
         )}
 

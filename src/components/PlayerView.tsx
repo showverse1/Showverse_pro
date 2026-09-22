@@ -637,23 +637,9 @@ export const PlayerView: React.FC = () => {
                 />
                 <div>
                   <h4 className="text-sm font-bold text-white">{currentVideo.creatorName}</h4>
-                  <p className="text-xs text-zinc-400">Verified ShowVerse Creator • 420K Subscribers</p>
+                  <p className="text-xs text-zinc-400">Verified ShowVerse Creator</p>
                 </div>
               </div>
-
-              <button
-                onClick={() => {
-                  setIsSubscribed(!isSubscribed);
-                  showToast(isSubscribed ? 'Unsubscribed' : `Subscribed to ${currentVideo.creatorName}!`, 'info');
-                }}
-                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-                  isSubscribed
-                    ? 'bg-zinc-800 text-zinc-300 border border-zinc-700'
-                    : 'bg-amber-500 text-zinc-950 hover:bg-amber-400 shadow-md shadow-amber-500/20'
-                }`}
-              >
-                {isSubscribed ? 'Subscribed' : 'Subscribe'}
-              </button>
             </div>
 
             {/* Description & Tags */}

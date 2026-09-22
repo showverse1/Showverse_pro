@@ -15,28 +15,15 @@ import {
   Tag,
   Layers,
   Filter,
-  Tv
+  Tv,
+  LogOut,
+  Upload,
+  Image as ImageIcon
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { Video, VideoCategory } from '../types';
 import { BulkUploadModal } from './BulkUploadModal';
 import { EpisodeSeasonModal } from './EpisodeSeasonModal';
-
-const SAMPLE_STREAM_PRESETS = [
-  { label: 'Tears of Steel (Sci-Fi 4K)', url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4' },
-  { label: 'Sintel (Fantasy / Anime 4K)', url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4' },
-  { label: 'Big Buck Bunny (Action / Animation)', url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4' },
-  { label: 'For Bigger Blazes (Racing / High Speed)', url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4' },
-  { label: 'For Bigger Escapes (Nature Documentary)', url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4' }
-];
-
-const SAMPLE_THUMBNAIL_PRESETS = [
-  'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=800&auto=format&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1563089145-599997674d42?w=800&auto=format&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=800&auto=format&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1511919884226-fd3cad34687c?w=800&auto=format&fit=crop&q=80'
-];
 
 export const AdminStudio: React.FC = () => {
   const { 
@@ -46,9 +33,13 @@ export const AdminStudio: React.FC = () => {
     deleteVideo, 
     playVideo, 
     seedResetVideos, 
+    clearDemoVideos,
+    clearAllVideos,
     showToast,
     user,
-    isFirebaseConnected
+    isFirebaseConnected,
+    logoutUser,
+    setActiveTab
   } = useApp();
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -60,8 +51,8 @@ export const AdminStudio: React.FC = () => {
   const [title, setTitle] = useState('');
   const [tagline, setTagline] = useState('');
   const [description, setDescription] = useState('');
-  const [videoUrl, setVideoUrl] = useState(SAMPLE_STREAM_PRESETS[0].url);
-  const [thumbnail, setThumbnail] = useState(SAMPLE_THUMBNAIL_PRESETS[0]);
+  const [videoUrl, setVideoUrl] = useState('');
+  const [thumbnail, setThumbnail] = useState('');
   const [category, setCategory] = useState<VideoCategory>('Kdrama');
   const [quality, setQuality] = useState<'4K Ultra HD' | '1080p FHD' | '720p HD'>('4K Ultra HD');
   const [ageRating, setAgeRating] = useState<'All' | 'PG-13' | '16+' | 'TV-MA'>('16+');
@@ -147,13 +138,31 @@ export const AdminStudio: React.FC = () => {
 
         <div className="flex flex-wrap items-center gap-2">
           <button
-            id="seed-reset-btn"
-            onClick={seedResetVideos}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white border border-zinc-800 text-xs font-semibold transition-colors"
-            title="Reset library to defaults"
+            id="purge-demo-btn"
+            onClick={async () => {
+              if (window.confirm('Remove all demo/AI sample videos and keep only genuine admin uploads?')) {
+                await clearDemoVideos();
+              }
+            }}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-amber-400 hover:text-amber-300 border border-zinc-800 text-xs font-semibold transition-colors"
+            title="Remove all demo sample videos and keep only genuine admin uploads"
           >
             <RotateCcw className="w-3.5 h-3.5" />
-            <span>Reset Defaults</span>
+            <span>Purge AI/Demo Videos</span>
+          </button>
+
+          <button
+            id="clear-all-btn"
+            onClick={async () => {
+              if (window.confirm('Are you sure you want to clear the entire catalog?')) {
+                await clearAllVideos();
+              }
+            }}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-rose-400 border border-zinc-800 text-xs font-semibold transition-colors"
+            title="Clear all videos"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+            <span>Clear Catalog</span>
           </button>
 
           <button
@@ -171,7 +180,20 @@ export const AdminStudio: React.FC = () => {
             className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-zinc-950 font-bold text-xs shadow-lg shadow-amber-500/20 transition-all"
           >
             <Plus className="w-4 h-4" />
-            <span>Publish Single Video</span>
+            <span>Upload Real Video</span>
+          </button>
+
+          <button
+            id="admin-logout-btn"
+            onClick={async () => {
+              await logoutUser();
+              setActiveTab('home');
+            }}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 hover:text-rose-300 border border-rose-500/20 text-xs font-semibold transition-colors"
+            title="Log Out of Admin Account"
+          >
+            <LogOut className="w-3.5 h-3.5" />
+            <span>Log Out</span>
           </button>
         </div>
       </div>
@@ -439,62 +461,86 @@ export const AdminStudio: React.FC = () => {
                 </div>
               </div>
 
-              {/* Stream URL & Preset quick selector */}
+              {/* Real Video Stream URL */}
               <div>
                 <div className="flex items-center justify-between mb-1">
                   <label className="text-zinc-400 font-semibold">Video Stream URL (MP4 / WebM / HLS) *</label>
-                  <span className="text-[10px] text-zinc-500">Pick a sample or enter custom</span>
+                  <span className="text-[10px] text-zinc-500">Direct streaming video link</span>
                 </div>
                 <input
                   type="url"
                   required
-                  placeholder="https://.../video.mp4"
+                  placeholder="https://.../video.mp4 or HLS .m3u8"
                   value={videoUrl}
                   onChange={(e) => setVideoUrl(e.target.value)}
-                  className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-zinc-100 font-mono focus:outline-none focus:border-amber-500"
+                  className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-zinc-100 font-mono focus:outline-none focus:border-amber-500 text-sm"
                 />
-                {/* Presets */}
-                <div className="flex flex-wrap gap-1.5 mt-2">
-                  {SAMPLE_STREAM_PRESETS.map((p) => (
-                    <button
-                      type="button"
-                      key={p.label}
-                      onClick={() => setVideoUrl(p.url)}
-                      className={`px-2 py-0.5 rounded text-[10px] border transition-colors ${
-                        videoUrl === p.url
-                          ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
-                          : 'bg-zinc-800 text-zinc-400 border-zinc-700 hover:text-white'
-                      }`}
-                    >
-                      {p.label}
-                    </button>
-                  ))}
-                </div>
               </div>
 
-              {/* Thumbnail URL & Presets */}
+              {/* Real Thumbnail Image & Upload */}
               <div>
-                <label className="block text-zinc-400 font-semibold mb-1">Thumbnail Poster URL *</label>
-                <input
-                  type="url"
-                  required
-                  placeholder="https://images.unsplash.com/..."
-                  value={thumbnail}
-                  onChange={(e) => setThumbnail(e.target.value)}
-                  className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-zinc-100 font-mono focus:outline-none focus:border-amber-500"
-                />
-                <div className="flex gap-2 mt-2">
-                  {SAMPLE_THUMBNAIL_PRESETS.map((t, idx) => (
-                    <img
-                      key={idx}
-                      src={t}
-                      alt="preset"
-                      onClick={() => setThumbnail(t)}
-                      className={`w-12 aspect-video rounded object-cover cursor-pointer border-2 transition-all ${
-                        thumbnail === t ? 'border-amber-500 scale-105' : 'border-transparent opacity-70 hover:opacity-100'
-                      }`}
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-zinc-400 font-semibold">Thumbnail Poster Image *</label>
+                  <span className="text-[10px] text-zinc-500">Paste URL or pick image file</span>
+                </div>
+                
+                <div className="space-y-2">
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      required
+                      placeholder="https://.../poster.jpg or choose file below"
+                      value={thumbnail}
+                      onChange={(e) => setThumbnail(e.target.value)}
+                      className="flex-1 bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-zinc-100 font-mono focus:outline-none focus:border-amber-500 text-sm"
                     />
-                  ))}
+                    <label className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 cursor-pointer border border-zinc-700 text-xs font-semibold shrink-0 transition-colors">
+                      <Upload className="w-3.5 h-3.5 text-amber-400" />
+                      <span>Pick File</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            const reader = new FileReader();
+                            reader.onloadend = () => {
+                              if (reader.result) {
+                                setThumbnail(reader.result as string);
+                                showToast('Image file selected for thumbnail', 'info');
+                              }
+                            };
+                            reader.readAsDataURL(file);
+                          }
+                        }}
+                      />
+                    </label>
+                  </div>
+
+                  {thumbnail && (
+                    <div className="flex items-center gap-3 p-2 rounded-xl bg-zinc-950 border border-zinc-800">
+                      <img
+                        src={thumbnail}
+                        alt="Thumbnail preview"
+                        className="w-20 aspect-video rounded-lg object-cover border border-zinc-750"
+                        onError={(e) => {
+                          (e.target as HTMLElement).style.display = 'none';
+                        }}
+                      />
+                      <div className="flex-1 text-xs text-zinc-400 truncate">
+                        <span className="text-zinc-300 font-semibold block">Poster Ready</span>
+                        <span className="truncate block font-mono text-[10px]">{thumbnail.substring(0, 45)}...</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setThumbnail('')}
+                        className="text-xs text-rose-400 hover:text-rose-300 px-2 py-1 rounded bg-rose-500/10 hover:bg-rose-500/20"
+                      >
+                        Clear
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
 

@@ -28,57 +28,6 @@ interface BulkRowItem {
 
 const CATEGORIES: VideoCategory[] = ['Anime', 'Kdrama', 'Chinese Drama', 'Movie', 'Indian'];
 
-const DEFAULT_STREAM = 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
-const DEFAULT_THUMBNAIL = 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=800&auto=format&fit=crop&q=80';
-
-const BULK_SAMPLE_PRESETS: Omit<BulkRowItem, 'id'>[] = [
-  {
-    title: 'Attack on Titan: The Final Season',
-    category: 'Anime',
-    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-    thumbnail: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=800&auto=format&fit=crop&q=80',
-    quality: '4K Ultra HD',
-    tags: 'Anime, Action, Dark Fantasy',
-    tagline: 'The war for Paradis enters its apocalyptic final phase.'
-  },
-  {
-    title: 'Crash Landing on You: Special Edition',
-    category: 'Kdrama',
-    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
-    thumbnail: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80',
-    quality: '4K Ultra HD',
-    tags: 'Kdrama, Romance, Drama',
-    tagline: 'A whirlwind romance that crosses forbidden borders.'
-  },
-  {
-    title: 'Love Between Fairy and Devil',
-    category: 'Chinese Drama',
-    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4',
-    thumbnail: 'https://images.unsplash.com/photo-1563089145-599997674d42?w=800&auto=format&fit=crop&q=80',
-    quality: '4K Ultra HD',
-    tags: 'Chinese Drama, Xianxia, Fantasy',
-    tagline: 'The resurrected Moon Supreme encounters an immortal orchid fairy.'
-  },
-  {
-    title: 'Interstellar: 10th Anniversary Remaster',
-    category: 'Movie',
-    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
-    thumbnail: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=800&auto=format&fit=crop&q=80',
-    quality: '4K Ultra HD',
-    tags: 'Movie, Sci-Fi, Space, Blockbuster',
-    tagline: 'Mankinds next step will be our greatest.'
-  },
-  {
-    title: 'Sacred Games: Mumbai Noir',
-    category: 'Indian',
-    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyBlazes.mp4',
-    thumbnail: 'https://images.unsplash.com/photo-1511919884226-fd3cad34687c?w=800&auto=format&fit=crop&q=80',
-    quality: '4K Ultra HD',
-    tags: 'Indian, Crime, Thriller, Noir',
-    tagline: 'A phone call in the dark gives Sartaj Singh 25 days to save the city.'
-  }
-];
-
 interface BulkUploadModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -94,20 +43,10 @@ export const BulkUploadModal: React.FC<BulkUploadModalProps> = ({ isOpen, onClos
       id: 'row-1',
       title: '',
       category: 'Anime',
-      videoUrl: DEFAULT_STREAM,
-      thumbnail: DEFAULT_THUMBNAIL,
+      videoUrl: '',
+      thumbnail: '',
       quality: '4K Ultra HD',
-      tags: 'Anime, Action',
-      tagline: ''
-    },
-    {
-      id: 'row-2',
-      title: '',
-      category: 'Kdrama',
-      videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
-      thumbnail: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80',
-      quality: '4K Ultra HD',
-      tags: 'Kdrama, Romance',
+      tags: 'Anime',
       tagline: ''
     }
   ]);
@@ -126,8 +65,8 @@ export const BulkUploadModal: React.FC<BulkUploadModalProps> = ({ isOpen, onClos
         id: newId,
         title: '',
         category: 'Anime',
-        videoUrl: DEFAULT_STREAM,
-        thumbnail: DEFAULT_THUMBNAIL,
+        videoUrl: '',
+        thumbnail: '',
         quality: '4K Ultra HD',
         tags: 'Anime',
         tagline: ''
@@ -152,28 +91,6 @@ export const BulkUploadModal: React.FC<BulkUploadModalProps> = ({ isOpen, onClos
     showToast(`Set all rows to ${cat}`, 'info');
   };
 
-  const handleLoadSampleBatch = () => {
-    const sampleRows: BulkRowItem[] = BULK_SAMPLE_PRESETS.map((preset, idx) => ({
-      ...preset,
-      id: `sample-${Date.now()}-${idx}`
-    }));
-    setRows(sampleRows);
-    showToast('Loaded 5 multi-category sample videos (Anime, Kdrama, Chinese Drama, Movie, Indian)', 'success');
-  };
-
-  // Text parser
-  const handleFillSampleText = () => {
-    const sampleTextLines = [
-      'Solo Leveling S2 | Anime | https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4 | https://images.unsplash.com/photo-1578632767115-351597cf2477?w=800&auto=format&fit=crop&q=80 | Anime, Action, Fantasy',
-      'The Glory Part 2 | Kdrama | https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4 | https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80 | Kdrama, Revenge, Thriller',
-      'Till the End of the Moon | Chinese Drama | https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4 | https://images.unsplash.com/photo-1563089145-599997674d42?w=800&auto=format&fit=crop&q=80 | Chinese Drama, Xianxia, Romance',
-      'RRR: Rise Roar Revolt | Indian | https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyBlazes.mp4 | https://images.unsplash.com/photo-1511919884226-fd3cad34687c?w=800&auto=format&fit=crop&q=80 | Indian, Action, Historical',
-      'Oppenheimer: IMAX Cut | Movie | https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4 | https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=800&auto=format&fit=crop&q=80 | Movie, Biography, Drama'
-    ].join('\n');
-    setRawText(sampleTextLines);
-    showToast('Filled sample text for quick import', 'info');
-  };
-
   const parseTextRows = () => {
     if (!rawText.trim()) return [];
     const lines = rawText.split('\n').map(l => l.trim()).filter(Boolean);
@@ -191,8 +108,8 @@ export const BulkUploadModal: React.FC<BulkUploadModalProps> = ({ isOpen, onClos
       else if (rawCat.includes('indian') || rawCat.includes('hindi') || rawCat.includes('bollywood')) category = 'Indian';
       else if (rawCat.includes('movie') || rawCat.includes('film')) category = 'Movie';
 
-      const videoUrl = parts[2] || DEFAULT_STREAM;
-      const thumbnail = parts[3] || DEFAULT_THUMBNAIL;
+      const videoUrl = parts[2] || '';
+      const thumbnail = parts[3] || '';
       const tags = parts[4] ? parts[4].split(',').map(t => t.trim()) : [category, 'Featured'];
 
       return {
@@ -232,9 +149,9 @@ export const BulkUploadModal: React.FC<BulkUploadModalProps> = ({ isOpen, onClos
     }> = [];
 
     if (activeTab === 'table') {
-      const validRows = rows.filter(r => r.title.trim().length > 0);
+      const validRows = rows.filter(r => r.title.trim().length > 0 && r.videoUrl.trim().length > 0);
       if (validRows.length === 0) {
-        showToast('Please enter a title for at least one video row', 'warning');
+        showToast('Please enter at least a title and video URL for your videos', 'warning');
         return;
       }
 
@@ -246,9 +163,9 @@ export const BulkUploadModal: React.FC<BulkUploadModalProps> = ({ isOpen, onClos
         return {
           title: r.title.trim(),
           category: r.category,
-          videoUrl: r.videoUrl.trim() || DEFAULT_STREAM,
-          thumbnail: r.thumbnail.trim() || DEFAULT_THUMBNAIL,
-          banner: r.thumbnail.trim() || DEFAULT_THUMBNAIL,
+          videoUrl: r.videoUrl.trim(),
+          thumbnail: r.thumbnail.trim(),
+          banner: r.thumbnail.trim(),
           tags,
           tagline: r.tagline.trim() || `${r.category} special release`,
           description: `Watch high definition ${r.category} stream "${r.title}". Available in ${r.quality}.`,
@@ -268,9 +185,9 @@ export const BulkUploadModal: React.FC<BulkUploadModalProps> = ({ isOpen, onClos
       });
     } else {
       // Text mode
-      const parsed = parseTextRows();
+      const parsed = parseTextRows().filter(p => p.title && p.videoUrl);
       if (parsed.length === 0) {
-        showToast('Please enter text or click "Fill Sample Template"', 'warning');
+        showToast('Please enter formatted lines with at least Title and Video URL', 'warning');
         return;
       }
 
@@ -398,25 +315,13 @@ export const BulkUploadModal: React.FC<BulkUploadModalProps> = ({ isOpen, onClos
                   </button>
                 ))}
               </div>
-
-              <button
-                onClick={handleLoadSampleBatch}
-                className="flex items-center gap-1 text-[11px] font-semibold text-amber-400 hover:text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 px-2.5 py-1 rounded-lg transition-colors ml-1"
-              >
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>Fill Demo Batch</span>
-              </button>
             </div>
           )}
 
           {activeTab === 'text' && (
-            <button
-              onClick={handleFillSampleText}
-              className="flex items-center gap-1 text-[11px] font-semibold text-amber-400 hover:text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 px-2.5 py-1 rounded-lg transition-colors"
-            >
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Fill Sample Template</span>
-            </button>
+            <div className="text-[11px] text-zinc-400">
+              Format: <code className="text-amber-400 font-mono">Title | Category | VideoURL | ThumbnailURL | Tags</code>
+            </div>
           )}
         </div>
 
@@ -529,18 +434,44 @@ export const BulkUploadModal: React.FC<BulkUploadModalProps> = ({ isOpen, onClos
                       />
                     </div>
 
-                    {/* Thumbnail URL */}
+                    {/* Thumbnail URL and File picker */}
                     <div className="sm:col-span-6">
-                      <label className="block text-[11px] text-zinc-400 font-medium mb-1">
-                        Cover Thumbnail Image URL
-                      </label>
-                      <input
-                        type="text"
-                        value={row.thumbnail}
-                        onChange={(e) => handleRowChange(row.id, 'thumbnail', e.target.value)}
-                        placeholder="https://images.unsplash.com/..."
-                        className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-2.5 py-1.5 text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-amber-500 font-mono text-[11px]"
-                      />
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="text-[11px] text-zinc-400 font-medium">
+                          Cover Thumbnail Image (URL or Pick File)
+                        </label>
+                      </div>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={row.thumbnail}
+                          onChange={(e) => handleRowChange(row.id, 'thumbnail', e.target.value)}
+                          placeholder="https://.../thumbnail.jpg or select file"
+                          className="flex-1 bg-zinc-900 border border-zinc-800 rounded-lg px-2.5 py-1.5 text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-amber-500 font-mono text-[11px]"
+                        />
+                        <label className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700 text-[11px] font-medium cursor-pointer shrink-0 transition-colors">
+                          <Upload className="w-3 h-3 text-amber-400" />
+                          <span>File</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                const reader = new FileReader();
+                                reader.onloadend = () => {
+                                  if (reader.result) {
+                                    handleRowChange(row.id, 'thumbnail', reader.result as string);
+                                    showToast(`Loaded poster for video #${idx + 1}`, 'info');
+                                  }
+                                };
+                                reader.readAsDataURL(file);
+                              }
+                            }}
+                          />
+                        </label>
+                      </div>
                     </div>
 
                   </div>

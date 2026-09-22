@@ -16,14 +16,13 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js 20
+      - name: Setup Node.js 22
         uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: 'npm'
+          node-version: 22
 
       - name: Install Node Dependencies
-        run: npm install
+        run: npm install --legacy-peer-deps
 
       - name: Build Web Application
         run: npm run build
@@ -34,21 +33,21 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
 
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
       - name: Setup Capacitor Android Platform
         run: |
-          npx cap add android || true
           npx cap sync android
 
       - name: Make Gradle Executable
         run: |
-          if [ -f "android/gradlew" ]; then
-            chmod +x android/gradlew
-          fi
+          chmod +x android/gradlew
 
       - name: Build Debug APK with Gradle
         run: |
           cd android
-          ./gradlew assembleDebug --no-daemon
+          ./gradlew assembleDebug --no-daemon --stacktrace
 
       - name: Upload APK as GitHub Artifact
         uses: actions/upload-artifact@v4

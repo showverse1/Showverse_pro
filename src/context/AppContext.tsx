@@ -54,6 +54,8 @@ interface AppContextType {
   updateVideo: (id: string, updated: Partial<Video>) => void;
   deleteVideo: (id: string) => void;
   seedResetVideos: () => void;
+  clearDemoVideos: () => Promise<void>;
+  clearAllVideos: () => Promise<void>;
   selectedModalVideo: Video | null;
   setSelectedModalVideo: (video: Video | null) => void;
   likeVideo: (videoId: string) => void;
@@ -94,15 +96,19 @@ const DEFAULT_USER: UserProfile = {
 };
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Load videos
+  // Load videos (Admin uploads only, no artificial demo or AI videos)
   const [videos, setVideos] = useState<Video[]>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEYS.VIDEOS);
-      if (saved) return JSON.parse(saved);
+      if (saved) {
+        const parsed: Video[] = JSON.parse(saved);
+        const demoIds = new Set(INITIAL_VIDEOS.map(v => v.id));
+        return parsed.filter(v => !demoIds.has(v.id));
+      }
     } catch {
       // fallback
     }
-    return INITIAL_VIDEOS;
+    return [];
   });
 
   // Load comments
@@ -177,25 +183,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         if (!isSubscribed) return;
         setIsFirebaseConnected(true);
         if (snapshot.empty) {
-          // Fresh Firestore: automatically populate initial videos
-          try {
-            const batch = writeBatch(db);
-            INITIAL_VIDEOS.forEach((v) => {
-              const ref = doc(db, 'videos', v.id);
-              batch.set(ref, v);
-            });
-            await batch.commit();
-          } catch (seedErr) {
-            console.warn("Initial Firestore videos seeding failed:", seedErr);
-          }
+          // Empty Firestore: catalog is ready for admin uploads
+          setVideos([]);
         } else {
           const remoteVideos: Video[] = [];
+          const demoIds = new Set(INITIAL_VIDEOS.map(v => v.id));
           snapshot.forEach((snap) => {
-            remoteVideos.push(snap.data() as Video);
+            const data = snap.data() as Video;
+            if (!demoIds.has(data.id)) {
+              remoteVideos.push(data);
+            }
           });
-          if (remoteVideos.length > 0) {
-            setVideos(remoteVideos);
-          }
+          setVideos(remoteVideos);
         }
       }, (err) => {
         console.warn("Firestore videos sync warning:", err);
@@ -604,6 +603,40 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     showToast('Database reset to official ShowVerse library', 'info');
   };
 
+  const clearDemoVideos = async () => {
+    const demoIds = INITIAL_VIDEOS.map(v => v.id);
+    setVideos(prev => prev.filter(v => !demoIds.includes(v.id)));
+    localStorage.removeItem(STORAGE_KEYS.VIDEOS);
+
+    try {
+      const batch = writeBatch(db);
+      demoIds.forEach((id) => {
+        batch.delete(doc(db, 'videos', id));
+      });
+      await batch.commit();
+    } catch (err) {
+      console.warn('Error removing demo videos from Firestore:', err);
+    }
+    showToast('Demo AI/Sample videos removed. Only admin uploads remain!', 'success');
+  };
+
+  const clearAllVideos = async () => {
+    const allCurrent = [...videos];
+    setVideos([]);
+    localStorage.removeItem(STORAGE_KEYS.VIDEOS);
+
+    try {
+      const batch = writeBatch(db);
+      allCurrent.forEach(v => {
+        batch.delete(doc(db, 'videos', v.id));
+      });
+      await batch.commit();
+    } catch (err) {
+      console.warn('Error clearing catalog in Firestore:', err);
+    }
+    showToast('All videos cleared. Ready for fresh uploads.', 'info');
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -642,6 +675,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         updateVideo,
         deleteVideo,
         seedResetVideos,
+        clearDemoVideos,
+        clearAllVideos,
         selectedModalVideo,
         setSelectedModalVideo,
         likeVideo,

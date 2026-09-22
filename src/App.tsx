@@ -26,6 +26,7 @@ import {
   Flame
 } from 'lucide-react';
 import { VideoCategory } from './types';
+import { initNativeFeatures, triggerHaptic } from './lib/nativeBridge';
 
 const MainAppContent: React.FC = () => {
   const { 
@@ -37,10 +38,43 @@ const MainAppContent: React.FC = () => {
     selectedCategory, 
     setSelectedCategory,
     user,
-    isAdmin 
+    isAdmin,
+    currentVideo,
+    setCurrentVideo,
+    selectedModalVideo,
+    setSelectedModalVideo
   } = useApp();
 
   const [isAuthOpen, setIsAuthOpen] = useState(false);
+
+  // Setup Native Android Features (Status bar, back button, splash screen)
+  React.useEffect(() => {
+    initNativeFeatures({
+      onBackButton: () => {
+        if (isAuthOpen) {
+          setIsAuthOpen(false);
+          triggerHaptic('light');
+          return true;
+        }
+        if (selectedModalVideo) {
+          setSelectedModalVideo(null);
+          triggerHaptic('light');
+          return true;
+        }
+        if (currentVideo) {
+          setCurrentVideo(null);
+          triggerHaptic('light');
+          return true;
+        }
+        if (activeTab !== 'home') {
+          setActiveTab('home');
+          triggerHaptic('light');
+          return true;
+        }
+        return false;
+      }
+    });
+  }, [isAuthOpen, selectedModalVideo, currentVideo, activeTab]);
 
   // Filter videos based on search or category
   const filteredVideos = videos.filter((v) => {
@@ -170,6 +204,34 @@ const MainAppContent: React.FC = () => {
               /* Standard Home View categorized cleanly */
               <div className="space-y-10">
                 
+                {/* Clean state when no videos are in catalog */}
+                {videos.length === 0 && (
+                  <div className="py-20 px-4 text-center max-w-lg mx-auto space-y-4">
+                    <div className="w-16 h-16 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center mx-auto text-amber-400">
+                      <Film className="w-8 h-8" />
+                    </div>
+                    <h3 className="text-xl font-bold text-white font-['Outfit']">Catalog Ready for Admin Videos</h3>
+                    <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed">
+                      AI and demo sample videos have been removed. Only real videos uploaded through the Admin Studio will appear here.
+                    </p>
+                    {isAdmin ? (
+                      <button
+                        onClick={() => setActiveTab('studio')}
+                        className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-zinc-950 font-bold text-xs shadow-lg shadow-amber-500/20 transition-all"
+                      >
+                        Open Admin Upload Studio
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => setIsAuthOpen(true)}
+                        className="px-5 py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 font-bold text-xs border border-zinc-700 transition-all"
+                      >
+                        Admin Login to Upload
+                      </button>
+                    )}
+                  </div>
+                )}
+
                 {/* Hero Showcase Spotlight */}
                 {featuredVideo && <HeroBanner featuredVideo={featuredVideo} />}
 

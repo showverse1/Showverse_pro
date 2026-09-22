@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ShowVerse Pro - Premium Video & Entertainment Streaming</title>
+    <meta name="description" content="Next-generation video streaming and entertainment platform featuring cinematic player, watch later list, interactive comments, and content studio." />
+    <meta property="og:title" content="ShowVerse Pro - Premium Video & Entertainment Streaming" />
+    <meta property="og:description" content="Next-generation video streaming and entertainment platform featuring cinematic player, watch later list, interactive comments, and content studio." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Plyr CSS for ShowVerse Master Video Player -->
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+    <!-- HLS.js for Live Streaming & M3U8 Playback -->
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.7/dist/hls.min.js"></script>
+    <!-- Plyr Core Script -->
+    <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
+    <!-- Lucide Icons Bundle -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+  </head>
+  <body class="bg-zinc-950 text-zinc-100 antialiased selection:bg-cyan-500 selection:text-black">
+    <div id="root"></div>
+    <!-- Load Core ShowVerse Vanilla Modules in background for native window access -->
+    <script type="module">
+      import "./firebase.js";
+      import "./auth.js";
+      import "./watchLater.js";
+      import "./comments.js";
+      import "./player.js";
+      import "./admin.js";
+      import "./continueWatching.js";
+      import "./shows.js";
+      import "./navigation.js";
+    </script>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+

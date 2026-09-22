@@ -1,0 +1,174 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --brand-cyan: #00f0ff;
+    --brand-cyan-glow: rgba(0, 240, 255, 0.4);
+  }
+}
+
+/* Custom ShowVerse Neon & Theme Utilities */
+.text-brand-cyan {
+  color: #00f0ff !important;
+}
+
+.bg-brand-cyan {
+  background-color: #00f0ff !important;
+}
+
+.border-brand-cyan {
+  border-color: #00f0ff !important;
+}
+
+.shadow-neon-cyan {
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.5), 0 0 30px rgba(0, 240, 255, 0.2) !important;
+}
+
+/* Video Aspect Ratio Modes */
+.video-scale-fit video {
+  object-fit: contain !important;
+}
+
+.video-scale-stretch video {
+  object-fit: fill !important;
+}
+
+.video-scale-crop video {
+  object-fit: cover !important;
+}
+
+.video-scale-cinema video {
+  object-fit: cover !important;
+  transform: scaleY(1.15) !important;
+}
+
+/* HUD overlays */
+.video-aspect-hud,
+.video-volume-hud {
+  position: absolute;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-10px);
+  z-index: 50;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.video-aspect-hud.is-visible,
+.video-volume-hud.is-active {
+  opacity: 1 !important;
+  transform: translateX(-50%) translateY(0) !important;
+}
+
+/* Plyr Custom Controls & Styling */
+.plyr {
+  border-radius: 1rem;
+  overflow: hidden;
+  --plyr-color-main: #00f0ff;
+  --plyr-video-control-color: #ffffff;
+  --plyr-video-control-color-hover: #00f0ff;
+}
+
+.plyr__control--aspect-toggle,
+.plyr__control--volume-boost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 8px !important;
+}
+
+.plyr__aspect-badge,
+.plyr__vol-boost-badge {
+  font-size: 9px;
+  font-weight: 800;
+  background: rgba(0, 240, 255, 0.15);
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  color: #00f0ff;
+  padding: 1px 4px;
+  border-radius: 4px;
+  margin-left: 2px;
+}
+
+.plyr__control--volume-boost.is-boosted .plyr__vol-boost-badge {
+  background: rgba(245, 158, 11, 0.2);
+  border-color: rgba(245, 158, 11, 0.6);
+  color: #fbbf24;
+}
+
+/* Stage top bar */
+.plyr__stage-top-bar {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  right: 14px;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  pointer-events: auto;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.plyr:hover .plyr__stage-top-bar,
+.plyr--paused .plyr__stage-top-bar {
+  opacity: 1;
+}
+
+.plyr__stage-top-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 75%;
+}
+
+.plyr__stage-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: white;
+  border-radius: 9999px;
+  padding: 6px 14px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.plyr__stage-btn:hover {
+  background: rgba(0, 240, 255, 0.2);
+  border-color: rgba(0, 240, 255, 0.5);
+  color: #00f0ff;
+}
+
+.plyr__stage-btn.is-boosted {
+  border-color: rgba(245, 158, 11, 0.6);
+  background: rgba(245, 158, 11, 0.2);
+  color: #fef08a;
+}
+
+.plyr__stage-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.plyr__stage-show-title {
+  font-size: 13px;
+  line-height: 1.2;
+}
+
+.plyr__stage-ep-title {
+  font-size: 11px;
+  line-height: 1.2;
+}
+
+/* Ambient glow */
+.yt-player-glow,
+.ambient-glow-box {
+  box-shadow: 0 0 50px rgba(0, 240, 255, 0.2), 0 0 100px rgba(168, 85, 247, 0.12) !important;
+}
+

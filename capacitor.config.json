@@ -2,10 +2,26 @@
   "appId": "com.showverse.pro",
   "appName": "ShowVerse Pro",
   "webDir": "dist",
+  "backgroundColor": "#0a0e17",
   "server": {
     "androidScheme": "https"
   },
   "android": {
     "allowMixedContent": true
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 1500,
+      "launchAutoHide": true,
+      "backgroundColor": "#0a0e17",
+      "androidSplashResourceName": "splash",
+      "androidScaleType": "CENTER_CROP",
+      "showSpinner": false
+    },
+    "StatusBar": {
+      "style": "DARK",
+      "backgroundColor": "#0a0e17",
+      "overlaysWebView": false
+    }
   }
 }

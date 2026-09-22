@@ -22,23 +22,6 @@ allprojects {
         google()
         mavenCentral()
     }
-    project.ext {
-        compileSdkVersion = 35
-        targetSdkVersion = 35
-    }
-}
-
-subprojects {
-    afterEvaluate { project ->
-        if (project.hasProperty("android")) {
-            project.android {
-                compileSdkVersion 35
-            }
-        }
-        tasks.matching { it.name.contains("AarMetadata") }.configureEach {
-            enabled = false
-        }
-    }
 }
 
 task clean(type: Delete) {

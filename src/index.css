@@ -1,5 +1,25 @@
 @import "tailwindcss";
 
+/* Native Mobile App Experience Standards */
+html, body, #root {
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
+  touch-action: manipulation;
+  background-color: #0a0e17;
+}
+
+/* Safe Area Inset Support for Android Notch & Nav Bar */
+body {
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
 @layer base {
   :root {
     --brand-cyan: #00f0ff;
